@@ -79,6 +79,6 @@ namespace HappyCamp.DataAccess.Service
         K FromDTO<K, T>(T dto)
             where T : DTO
             where K : Entity;
-;
+
     }
 }
