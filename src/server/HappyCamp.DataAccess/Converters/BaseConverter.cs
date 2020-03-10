@@ -2,31 +2,38 @@
 
 namespace HappyCamp.DataAccess.Converters
 {
-    abstract class BaseConverter<T, K> : IConverter<T, K>
-        where T : class, new()
-        where K : class, new()
+    abstract class BaseConverter : IConverter
     {
 
-        private static IMapper Mapper { get; set; }
+        private IMapper Mapper { get; set; }
 
         protected BaseConverter()
         {
-            Mapper = CreateMapper();
         }
 
-        public K Convert(T from)
+        public virtual K Convert<T, K>(T from)
         {
-            IMapper mapper = this.CreateMapper();
+            IMapper mapper = this.GetMapper<T, K>();
             K to = mapper.Map<K>(from);
             this.DoConvert(from, to);
             return to;
         }
 
-        protected virtual void DoConvert(T from, K to)
+        protected virtual void DoConvert<T, K>(T from, K to)
         {
         }
 
-        protected virtual IMapper CreateMapper()
+        private IMapper GetMapper<T, K>()
+        {
+            if (this.Mapper == null)
+            {
+                this.Mapper = this.CreateMapper<T, K>();
+            }
+
+            return this.Mapper;
+        }
+
+        protected virtual IMapper CreateMapper<T, K>()
         {
             MapperConfiguration config = new MapperConfiguration(cfg => cfg.CreateMap<T, K>());
             return config.CreateMapper();

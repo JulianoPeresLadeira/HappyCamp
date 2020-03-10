@@ -3,10 +3,11 @@ using HappyCamp.Domain.DTOs;
 
 namespace HappyCamp.DataAccess.Converters
 {
-    class PersonEntityToPersonConverter : BaseConverter<PersonEntity, Person>
+    class PersonEntityToPersonConverter : BaseConverter
     {
-        protected override void DoConvert(PersonEntity from, Person to)
+        public Person Convert(PersonEntity from)
         {
+            return base.Convert<PersonEntity, Person>(from);
         }
     }
 }

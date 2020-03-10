@@ -4,81 +4,65 @@ using HappyCamp.Domain.DTOs;
 
 namespace HappyCamp.DataAccess.Service
 {
-    abstract class AbstractSQLService<T>
-        where T : DTO
+    abstract class AbstractSQLService<TDTO>
+        where TDTO : DTO
     {
-        // private CRUDService<K> Service { get; set; }
-        // private BaseConverter<T, K> DTOToEntityConverter { get; set; }
-        // private BaseConverter<K, T> EntityToDTOConverter { get; set; }
+        internal class CRUDServiceDelegate<KEntity>
+            where KEntity : Entity
+        {
+            private CRUDService<KEntity> Service { get; set; }
+            private IConverter DTOToEntityConverter { get; set; }
+            private IConverter EntityToDTOConverter { get; set; }
 
-        private IConverterManager ConverterManager { get; set; }
+            public TDTO Get(long id)
+            {
+                KEntity entity = this.Service.Get(id);
+                return this.EntityToDTOConverter.Convert<KEntity, TDTO>(entity);
+            }
+            public TDTO Create(TDTO dto)
+            {
+                KEntity entity = this.DTOToEntityConverter.Convert<TDTO, KEntity>(dto);
+                entity = this.Service.Create(entity);
+                return this.EntityToDTOConverter.Convert<KEntity, TDTO>(entity);
+            }
+            public bool Delete(long id)
+            {
+                return this.Service.Delete(id);
+            }
+            public bool Update(TDTO dto)
+            {
+                KEntity entity = this.DTOToEntityConverter.Convert<TDTO, KEntity>(dto);
+                return this.Service.Update(entity);
+            }
+        }
 
-        protected AbstractSQLService(BaseConverter<T, K> DTOToEntityConverter, BaseConverter<K, T> EntityToDTOConverter)
+        private IConverter DTOToEntityConverter { get; set; }
+        private IConverter EntityToDTOConverter { get; set; }
+
+        private CRUDServiceDelegate<Entity> Delegate { get; set; }
+
+        protected AbstractSQLService(IConverter DTOToEntityConverter, IConverter EntityToDTOConverter, CRUDServiceDelegate<Entity> Delegate)
         {
             this.DTOToEntityConverter = DTOToEntityConverter;
             this.EntityToDTOConverter = EntityToDTOConverter;
+            this.Delegate = Delegate;
         }
 
-        public T Get(long id)
+        public TDTO Get(long id)
         {
-            K entity = this.Service.Get(id);
-            return this.EntityToDTOConverter.Convert(entity);
+            return this.Delegate.Get(id);
         }
-        public T Create(T dto)
+        public TDTO Create(TDTO dto)
         {
-            K entity = this.DTOToEntityConverter.Convert(dto);
-            entity = this.Service.Create(entity);
-            return this.EntityToDTOConverter.Convert(entity);
+            return this.Delegate.Create(dto);
         }
         public bool Delete(long id)
         {
-            return this.Service.Delete(id);
+            return this.Delegate.Delete(id);
         }
-        public bool Update(T dto)
+        public bool Update(TDTO dto)
         {
-            K entity = this.DTOToEntityConverter.Convert(dto);
-            return this.Service.Update(entity);
+            return this.Delegate.Update(dto);
         }
-    }
-
-    internal abstract class ConverterManager<T, K> : IConverterManager
-        where T : DTO, new()
-        where K : Entity, new()
-    {
-        public ConverterManager()
-        {
-        }
-
-        private BaseConverter<T, K> DTOToEntityConverter { get; set; }
-
-        private BaseConverter<K, T> EntityToDTOConverter { get; set; }
-
-        K IConverterManager.FromDTO<K, T>(T dto)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        CRUDService<K> GetService<K>()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        T IConverterManager.ToDTO<T, K>(K entity)
-        {
-            throw new System.NotImplementedException();
-        }
-    }
-
-    interface IConverterManager
-    {
-        CRUDService<K> GetService<K>()
-            where K : Entity;
-        T ToDTO<T, K>(K entity)
-            where T : DTO
-            where K : Entity;
-        K FromDTO<K, T>(T dto)
-            where T : DTO
-            where K : Entity;
-
     }
 }

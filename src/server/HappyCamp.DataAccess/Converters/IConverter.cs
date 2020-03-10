@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace HappyCamp.DataAccess.Converters
+﻿namespace HappyCamp.DataAccess.Converters
 {
-    interface IConverter<T, K>
+    interface IConverter
     {
-        K Convert(T from);
+        K Convert<T, K>(T from);
     }
 }
