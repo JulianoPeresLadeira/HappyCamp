@@ -7,8 +7,7 @@ namespace HappyCamp.DataAccess.Service
     abstract class AbstractSQLService<TDTO>
         where TDTO : DTO
     {
-        internal class CRUDServiceDelegate<KEntity>
-            where KEntity : Entity
+        internal class CRUDServiceDelegate<KEntity> : ICRUDServiceDelegate<TDTO> where KEntity : Entity
         {
             private CRUDService<KEntity> Service { get; set; }
             private IConverter DTOToEntityConverter { get; set; }
@@ -39,9 +38,9 @@ namespace HappyCamp.DataAccess.Service
         private IConverter DTOToEntityConverter { get; set; }
         private IConverter EntityToDTOConverter { get; set; }
 
-        private CRUDServiceDelegate<Entity> Delegate { get; set; }
+        private ICRUDServiceDelegate<TDTO> Delegate { get; set; }
 
-        protected AbstractSQLService(IConverter DTOToEntityConverter, IConverter EntityToDTOConverter, CRUDServiceDelegate<Entity> Delegate)
+        protected AbstractSQLService(IConverter DTOToEntityConverter, IConverter EntityToDTOConverter, ICRUDServiceDelegate<TDTO> Delegate)
         {
             this.DTOToEntityConverter = DTOToEntityConverter;
             this.EntityToDTOConverter = EntityToDTOConverter;
