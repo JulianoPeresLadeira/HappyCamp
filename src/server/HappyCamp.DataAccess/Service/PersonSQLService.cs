@@ -6,7 +6,7 @@ namespace HappyCamp.DataAccess.Service
 {
     internal class PersonSQLService : AbstractSQLService<Person>
     {
-        public PersonSQLService() : base(
+        internal PersonSQLService() : base(
             new PersonToPersonEntityConverter(), 
             new PersonEntityToPersonConverter(), 
             new CRUDServiceDelegate<PersonEntity>()) { }
