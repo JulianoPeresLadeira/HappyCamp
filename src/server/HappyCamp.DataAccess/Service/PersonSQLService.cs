@@ -4,8 +4,11 @@ using HappyCamp.Domain.DTOs;
 
 namespace HappyCamp.DataAccess.Service
 {
-    class PersonSQLService : AbstractSQLService<Person>
+    internal class PersonSQLService : AbstractSQLService<Person>
     {
-        PersonSQLService() : base(new PersonToPersonEntityConverter(), new PersonEntityToPersonConverter(), new CRUDServiceDelegate<PersonEntity>()) { }
+        public PersonSQLService() : base(
+            new PersonToPersonEntityConverter(), 
+            new PersonEntityToPersonConverter(), 
+            new CRUDServiceDelegate<PersonEntity>()) { }
     }
 }

@@ -4,17 +4,17 @@ using HappyCamp.DataAccess.Entities;
 using HappyCamp.DataAccess.Service;
 using HappyCamp.Domain.DTOs;
 using HappyCamp.Domain.Facades;
+using HappyCamp.Domain.Service;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace HappyCamp.DataAccess.Repositories
 {
-    public class PersonRepository : PersonSQLService, IPersonFacade
+    public sealed class PersonRepository : Repository<Person>, IPersonFacade
     {
-
-        private IConverter<Person, PersonEntity> ToEntity = new PersonToPersonEntityConverter();
-        private IConverter<PersonEntity, Person> FromEntity = new PersonEntityToPersonConverter();
+        private IConverter ToEntity = new PersonToPersonEntityConverter();
+        private IConverter FromEntity = new PersonEntityToPersonConverter();
 
         public IEnumerable<Person> GetByAge(ushort age)
         {
@@ -24,7 +24,7 @@ namespace HappyCamp.DataAccess.Repositories
             {
                 return context.Persons
                     .Where(prsn => prsn.BirthDate.Year == targetYear)
-                    .Select(FromEntity.Convert)
+                    .Select(FromEntity.Convert<PersonEntity, Person>)
                     .AsEnumerable();
             }
         }
@@ -35,7 +35,7 @@ namespace HappyCamp.DataAccess.Repositories
             {
                 return context.Persons
                     .Where(prsn => email.Equals(prsn.Email))
-                    .Select(FromEntity.Convert)
+                    .Select(FromEntity.Convert<PersonEntity, Person>)
                     .FirstOrDefault();
             }
         }
@@ -46,9 +46,14 @@ namespace HappyCamp.DataAccess.Repositories
             {
                 return context.Persons
                     .Where(prsn => nationality.Equals(prsn.Nationality))
-                    .Select(FromEntity.Convert)
+                    .Select(FromEntity.Convert<PersonEntity, Person>)
                     .AsEnumerable();
             }
+        }
+
+        protected override IService<Person> GetService()
+        {
+            return new PersonSQLService();
         }
     }
 }

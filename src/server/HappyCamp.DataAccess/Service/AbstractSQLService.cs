@@ -1,10 +1,11 @@
 ﻿using HappyCamp.DataAccess.Converters;
 using HappyCamp.DataAccess.Entities;
 using HappyCamp.Domain.DTOs;
+using HappyCamp.Domain.Service;
 
 namespace HappyCamp.DataAccess.Service
 {
-    abstract class AbstractSQLService<TDTO>
+    abstract class AbstractSQLService<TDTO> : IService<TDTO>
         where TDTO : DTO
     {
         internal class CRUDServiceDelegate<KEntity> : ICRUDServiceDelegate<TDTO> where KEntity : Entity
@@ -18,16 +19,19 @@ namespace HappyCamp.DataAccess.Service
                 KEntity entity = this.Service.Get(id);
                 return this.EntityToDTOConverter.Convert<KEntity, TDTO>(entity);
             }
+
             public TDTO Create(TDTO dto)
             {
                 KEntity entity = this.DTOToEntityConverter.Convert<TDTO, KEntity>(dto);
                 entity = this.Service.Create(entity);
                 return this.EntityToDTOConverter.Convert<KEntity, TDTO>(entity);
             }
+
             public bool Delete(long id)
             {
                 return this.Service.Delete(id);
             }
+            
             public bool Update(TDTO dto)
             {
                 KEntity entity = this.DTOToEntityConverter.Convert<TDTO, KEntity>(dto);

@@ -13,6 +13,7 @@ namespace HappyCamp.DataAccess.Service
                 return context.Set<T>().Find(id);
             }
         }
+
         public bool Delete(long id)
         {
             using (var context = new SQLServerContext())
@@ -28,6 +29,7 @@ namespace HappyCamp.DataAccess.Service
                 return false;
             }
         }
+
         public T Create(T entity)
         {
             using (var context = new SQLServerContext())
